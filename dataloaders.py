@@ -20,8 +20,6 @@ class BunnyDataset(Dataset):
         self.segs_paths = [os.path.join(gt_dir, img_file) for img_file in os.listdir(gt_dir)]
         self.imgs_paths.sort()
         self.segs_paths.sort()
-        print(self.imgs_paths)
-        print(self.segs_paths)
 
     def __len__(self):
         return len(self.imgs_paths)
@@ -30,6 +28,7 @@ class BunnyDataset(Dataset):
 
         img = np.array(Image.open(self.imgs_paths[idx]).convert("RGB"))
         seg = np.array(Image.open(self.segs_paths[idx]).convert("L"))
+        seg = np.where(seg>20, 1, 0)
         seg = seg.clip(max=1)
 
         if self.transforms:
@@ -39,6 +38,7 @@ class BunnyDataset(Dataset):
 
         #img = torch.tensor(img, dtype=torch.float32).permute([2,0,1])
         seg = torch.tensor(seg, dtype=torch.torch.int64)
+        img = img.float()
         return img,seg
 
 def get_dataloader(batch_size, input_dir, gt_dir, transforms=ToTensorV2(), shuffle=False):
@@ -56,6 +56,7 @@ if __name__ == '__main__':
     for x,y in loader:
         print(x.shape)
         print(y.shape)
+        print(type(x[0][0][0]))
         break
 
 

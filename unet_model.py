@@ -4,11 +4,9 @@ from torch import nn
 import numpy as np
 
 class Unet2D(nn.Module):
-    def __init__(self, in_channels, out_channels, channel_ratio=1):
+    def __init__(self, in_channels, out_channels):
         super().__init__()
         ch = np.array([32, 64, 128, 256, 512])
-        ch = channel_ratio*ch
-        ch = ch.round().astype(int)
         self.ch = ch
 
 
