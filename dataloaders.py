@@ -13,13 +13,19 @@ import matplotlib.pyplot as plt
 
 
 class BunnyDataset(Dataset):
-    def __init__(self, input_dir, gt_dir, transforms=ToTensorV2()):
+    def __init__(self, input_dir, gt_dir, ds_length=400, transforms=ToTensorV2()):
         super().__init__()
+        if ds_length>400:
+            assert("Max number of images is 400")
         self.transforms = transforms
         self.imgs_paths = [os.path.join(input_dir, img_file) for img_file in os.listdir(input_dir)]
         self.segs_paths = [os.path.join(gt_dir, img_file) for img_file in os.listdir(gt_dir)]
         self.imgs_paths.sort()
         self.segs_paths.sort()
+        #shorten dataset
+        self.imgs_paths = self.imgs_paths[:ds_length]
+        self.segs_paths = self.segs_paths[:ds_length]
+
 
     def __len__(self):
         return len(self.imgs_paths)
@@ -37,12 +43,12 @@ class BunnyDataset(Dataset):
             seg = augmentations["mask"]
 
         #img = torch.tensor(img, dtype=torch.float32).permute([2,0,1])
-        seg = torch.tensor(seg, dtype=torch.torch.int64)
+        #seg = torch.tensor(seg, dtype=torch.torch.int64)
         img = img.float()
         return img,seg
 
-def get_dataloader(batch_size, input_dir, gt_dir, transforms=ToTensorV2(), shuffle=False):
-    ds = BunnyDataset(input_dir, gt_dir, transforms)
+def get_dataloader(batch_size, input_dir, gt_dir, ds_length=400, transforms=ToTensorV2(), shuffle=False):
+    ds = BunnyDataset(input_dir, gt_dir, ds_length, transforms)
     loader = DataLoader(ds, batch_size, shuffle)
     return loader
     
